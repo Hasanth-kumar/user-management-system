@@ -1,0 +1,56 @@
+🔐 Step A: Register a New User (Optional)
+📍 POST http://localhost:8081/api/auth/register
+
+Request Body (JSON):
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "secure123"
+}
+✅ Expected Result:
+
+"User registered successfully!"
+📌 Skip this if the user is already registered.
+
+🔑 Step B: Login to Get JWT Token
+📍 POST http://localhost:8081/api/auth/login
+
+Request Body:
+{
+  "email": "john@example.com",
+  "password": "secure123"
+}
+✅ Expected Result:
+{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY4MzFhMjY0NWFhMWE0MDRiZTA4ZTZkMSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoiam9obl9kb2UiLCJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQ4MDk3NDUxLCJleHAiOjE3NDgxMTU0NTF9.uQUV7x99zq6cDz8l6x-l2r5sKeGQIINxjRcz8Mofogg" // you will get a result like this
+}
+📌 Copy the token — you'll use it to call user-service.
+
+🔒 Step C: Call Secured Endpoint in user-service WITH JWT
+📍 GET http://localhost:8082/api/profiles
+
+Headers:
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjY4MzFhMjY0NWFhMWE0MDRiZTA4ZTZkMSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoiam9obl9kb2UiLCJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQ4MDk3NDUxLCJleHAiOjE3NDgxMTU0NTF9.uQUV7x99zq6cDz8l6x-l2r5sKeGQIINxjRcz8Mofogg
+✅ Expected Result:
+
+HTTP 200 OK
+
+A list of user profiles (or empty array if none exist)
+
+🚫 Step D: Call Same Endpoint WITHOUT JWT
+📍 GET http://localhost:8082/api/profiles
+
+❌ No Authorization header
+
+✅ Expected Result:
+
+HTTP 401 Unauthorized
+
+JSON error like:
+
+{
+  "timestamp": "...",
+  "status": 401,
+  "error": "Unauthorized",
+  "path": "/api/profiles"
+}
