@@ -4,7 +4,9 @@ import com.ums.user_service.dto.UserProfileRequestDTO;
 import com.ums.user_service.dto.UserProfileResponseDTO;
 import com.ums.user_service.model.UserProfile;
 import com.ums.user_service.service.UserProfileService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,42 +20,54 @@ public class UserProfileController {
     private UserProfileService userProfileService;
 
     @PostMapping
-    public UserProfileResponseDTO createProfile(@RequestBody UserProfileRequestDTO profileRequest) {
+    public ResponseEntity<UserProfileResponseDTO> createProfile(@RequestBody @Valid UserProfileRequestDTO profileRequest) {
         UserProfile profile = convertToEntity(profileRequest);
-        return convertToResponseDTO(userProfileService.createProfile(profile));
+        UserProfile savedProfile = userProfileService.createProfile(profile);
+        return ResponseEntity.ok(convertToResponseDTO(savedProfile));
     }
 
     @GetMapping("/{id}")
-    public UserProfileResponseDTO getProfileById(@PathVariable String id) {
+    public ResponseEntity<UserProfileResponseDTO> getProfileById(@PathVariable String id) {
         return userProfileService.getProfileById(id)
-                .map(this::convertToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .map(profile -> ResponseEntity.ok(convertToResponseDTO(profile)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/user/{userId}")
-    public UserProfileResponseDTO getProfileByUserId(@PathVariable String userId) {
+    public ResponseEntity<UserProfileResponseDTO> getProfileByUserId(@PathVariable String userId) {
         return userProfileService.getProfileByUserId(userId)
-                .map(this::convertToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .map(profile -> ResponseEntity.ok(convertToResponseDTO(profile)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<UserProfileResponseDTO> getAllProfiles() {
-        return userProfileService.getAllProfiles()
+    public ResponseEntity<List<UserProfileResponseDTO>> getAllProfiles() {
+        List<UserProfileResponseDTO> profiles = userProfileService.getAllProfiles()
                 .stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(profiles);
     }
 
     @PutMapping("/{id}")
-    public UserProfileResponseDTO updateProfile(@PathVariable String id, @RequestBody UserProfileRequestDTO profileRequest) {
-        UserProfile updatedProfile = convertToEntity(profileRequest);
-        return convertToResponseDTO(userProfileService.updateProfile(id, updatedProfile));
+    public ResponseEntity<UserProfileResponseDTO> updateProfile(@PathVariable String id, @RequestBody @Valid UserProfileRequestDTO profileRequest) {
+        try {
+            UserProfile updatedProfile = convertToEntity(profileRequest);
+            UserProfile savedProfile = userProfileService.updateProfile(id, updatedProfile);
+            return ResponseEntity.ok(convertToResponseDTO(savedProfile));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProfile(@PathVariable String id) {
-        userProfileService.deleteProfile(id);
+    public ResponseEntity<Void> deleteProfile(@PathVariable String id) {
+        try {
+            userProfileService.deleteProfile(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // DTO Mapping Methods
@@ -61,7 +75,7 @@ public class UserProfileController {
     private UserProfile convertToEntity(UserProfileRequestDTO dto) {
         return UserProfile.builder()
                 .userId(dto.getUserId())
-                .fullName(dto.getFullName())
+                .fullName(dto.getFullName()) // This will use the computed getFullName() method
                 .phone(dto.getPhone())
                 .address(dto.getAddress())
                 .build();
@@ -77,5 +91,3 @@ public class UserProfileController {
                 .build();
     }
 }
-// This controller handles HTTP requests related to user profiles.
-// It provides endpoints for creating, retrieving, updating, and deleting user profiles.

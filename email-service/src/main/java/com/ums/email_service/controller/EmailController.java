@@ -19,7 +19,7 @@ public class EmailController {
 
     @PostMapping("/send")
     public ResponseEntity<EmailResponseDTO> sendEmail(@RequestBody @Valid EmailRequestDTO request) {
-        emailSenderService.sendEmail(request.getToEmail(), request.getSubject(), request.getBody());
+        emailSenderService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
         EmailResponseDTO response = new EmailResponseDTO("Email sent successfully!", LocalDateTime.now());
         return ResponseEntity.ok(response);
     }

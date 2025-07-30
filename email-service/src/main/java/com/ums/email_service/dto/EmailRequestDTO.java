@@ -13,7 +13,7 @@ public class EmailRequestDTO {
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Recipient email is required")
-    private String toEmail;
+    private String to;
 
     @NotBlank(message = "Subject is required")
     private String subject;

@@ -33,15 +33,28 @@ public class UserProfileService {
     public UserProfile updateProfile(String id, UserProfile updatedProfile) {
         return userProfileRepository.findById(id)
                 .map(existing -> {
-                    existing.setFullName(updatedProfile.getFullName());
-                    existing.setPhone(updatedProfile.getPhone());
-                    existing.setAddress(updatedProfile.getAddress());
+                    // Only update fields that are not null
+                    if (updatedProfile.getFullName() != null) {
+                        existing.setFullName(updatedProfile.getFullName());
+                    }
+                    if (updatedProfile.getPhone() != null) {
+                        existing.setPhone(updatedProfile.getPhone());
+                    }
+                    if (updatedProfile.getAddress() != null) {
+                        existing.setAddress(updatedProfile.getAddress());
+                    }
+                    if (updatedProfile.getUserId() != null) {
+                        existing.setUserId(updatedProfile.getUserId());
+                    }
                     return userProfileRepository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Profile not found"));
+                .orElseThrow(() -> new RuntimeException("Profile not found with id: " + id));
     }
 
     public void deleteProfile(String id) {
+        if (!userProfileRepository.existsById(id)) {
+            throw new RuntimeException("Profile not found with id: " + id);
+        }
         userProfileRepository.deleteById(id);
     }
 }
