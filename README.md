@@ -60,12 +60,12 @@ MAIL_PASSWORD=<your-gmail-app-password>
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/user-management-system.git
+   git clone https://github.com/Hasanth-kumar/user-management-system.git
    cd user-management-system
    ```
 
 2. Set up environment variables:
-   - Copy the `.env.template` files in each service directory to `.env`
+   - Copy the `env.template` files in each service directory to `.env`
    - Fill in your MongoDB Atlas credentials and other required values
 
 3. Build each service:
