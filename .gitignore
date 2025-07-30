@@ -36,4 +36,12 @@ mvnw.cmd
 # Spring Boot
 application-*.properties
 !application.properties
-!application.yml 
+!application.yml
+
+# Files to exclude from GitHub repository
+AllCodes.txt
+LICENSE
+"Questions i have regarding this project.docx"
+master-plan.md
+one-week-sprint-plan.md
+.github/ 
